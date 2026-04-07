@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Maya Matematika – Fungsi Eksponen & Logaritma</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surf:#ffffff;--surf2:#f8fafc;
+  --border:#dde3ec;--border2:#c5cfe0;
+  --acc:#7c3aed;--acc2:#8b5cf6;--acc3:#6d28d9;
+  --acc-exp:#2563eb;--acc-log:#059669;
+  --text:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --yellow:#d97706;--red:#dc2626;--green:#059669;
+  --h:56px;--fbase:14px;
+}
+@media(max-width:768px){:root{--fbase:13px;--h:46px;}}
+@media(min-width:1200px){:root{--fbase:15px;}}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 0%,rgba(124,58,237,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 50% at 90% 100%,rgba(37,99,235,0.05) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(148,163,184,0.07) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(148,163,184,0.07) 40px);
+}
+/* HEADER */
+header{
+  position:relative;z-index:10;height:var(--h);flex-shrink:0;
+  background:linear-gradient(135deg,#1e0a4f,#4c1d95,#7c3aed);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  display:flex;align-items:center;padding:0 14px;gap:12px;
+  box-shadow:0 2px 14px rgba(76,29,149,0.5);
+}
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#818cf8);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(167,139,250,0.4);}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:clamp(14px,1.8vw,20px);font-weight:800;color:#ffffff;line-height:1.1;}
+.logo-sub{font-size:9.5px;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;}
+nav{display:flex;gap:2px;flex:1;overflow-x:auto;justify-content:flex-end;}
+nav::-webkit-scrollbar{display:none;}
+.nb{position:relative;background:none;border:none;color:rgba(255,255,255,0.65);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(11px,1.2vw,13px);font-weight:600;padding:0 12px;height:var(--h);white-space:nowrap;transition:color .2s;display:flex;align-items:center;gap:6px;}
+.nb::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2.5px;background:linear-gradient(90deg,#a78bfa,#60a5fa);transform:scaleX(0);transition:transform .22s;border-radius:2px 2px 0 0;}
+.nb:hover{color:rgba(255,255,255,0.9);}
+.nb.active{color:#fff;}
+.nb.active::after{transform:scaleX(1);}
+.nb-icon{font-size:16px;}
+#menuToggle{display:none;background:none;border:none;cursor:pointer;padding:6px;color:#fff;flex-shrink:0;touch-action:manipulation;}
+@media(max-width:640px){
+  header{flex-wrap:nowrap;padding:0 10px;}
+  .logo-text{font-size:15px;}
+  .logo-sub{display:none;}
+  #menuToggle{display:flex;align-items:center;justify-content:center;margin-left:auto;}
+  nav{display:none;flex-direction:column;position:fixed;top:var(--h);right:0;left:0;z-index:999;
+    background:linear-gradient(180deg,#2e0a7a,#4c1d95);border-bottom:1px solid rgba(255,255,255,.15);
+    box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:visible;gap:0;flex:none;}
+  nav.open{display:flex;}
+  .nb{height:52px;width:100%;text-align:left;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);font-size:13.5px;}
+  .nb::after{display:none;}
+  .nb.active{background:rgba(255,255,255,.08);}
+}
+#app{position:relative;z-index:1;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;flex-direction:column;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.page.active{animation:fu .22s ease;}
+.scroll{flex:1;overflow-y:auto;padding:10px 14px 14px;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* HERO */
+.hero{background:linear-gradient(135deg,#3b0764,#4c1d95,#6d28d9);border-radius:10px;padding:12px 18px;margin-bottom:8px;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 4px 20px rgba(109,40,217,.25);}
+.hero::after{content:'∫';position:absolute;right:16px;top:-4px;font-size:72px;opacity:.07;pointer-events:none;font-family:'JetBrains Mono',monospace;color:#a78bfa;}
+.h-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.15em;color:#c4b5fd;text-transform:uppercase;margin-bottom:2px;}
+.h-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(13px,2vw,19px);font-weight:800;color:#fff;line-height:1.2;}
+.h-title span{color:#c4b5fd;}
+.h-desc{font-size:11.5px;color:#ddd6fe;line-height:1.5;max-width:500px;}
+/* CARD */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:7px;transition:border-color .2s,box-shadow .2s;box-shadow:0 1px 4px rgba(30,41,59,0.06);}
+.card:hover{border-color:var(--border2);box-shadow:0 3px 12px rgba(30,41,59,0.09);}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.ci{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci.b{background:rgba(124,58,237,.12);}
+.ci.y{background:rgba(217,119,6,.12);}
+.ci.g{background:rgba(5,150,105,.12);}
+.ci.r{background:rgba(220,38,38,.12);}
+.ci.p{background:rgba(37,99,235,.12);}
+.ct{font-family:'Space Grotesk',sans-serif;font-size:clamp(13px,1.5vw,15px);font-weight:700;color:var(--acc3);}
+.card p{font-size:clamp(12px,1.3vw,13.5px);line-height:1.7;color:var(--text2);margin-bottom:5px;}
+.card p:last-child{margin-bottom:0;}
+.card h4{font-size:clamp(10px,1.1vw,11.5px);font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.olist{list-style:none;}
+.olist li{display:flex;align-items:flex-start;gap:7px;font-size:clamp(12px,1.3vw,13.5px);color:var(--text2);line-height:1.6;padding:4px 0;border-bottom:1px solid var(--border);}
+.olist li:last-child{border-bottom:none;}
+.olist li::before{content:'›';color:var(--acc);font-weight:700;font-size:15px;margin-top:-1px;}
+.formula-box{font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.3vw,13px);background:linear-gradient(135deg,#f5f3ff,#ede9fe);padding:7px 11px;border-radius:7px;color:var(--acc3);border:1px solid rgba(124,58,237,.2);margin:5px 0;}
+.badge{border-radius:5px;padding:2.5px 8px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;}
+.badge-exp{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;}
+.badge-log{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;}
+/* STEP MAP */
+.step-map-item{display:flex;align-items:flex-start;gap:0;margin-bottom:0;position:relative;}
+.disc-area{width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:var(--text);background:var(--surf2);resize:vertical;outline:none;transition:border-color .17s;line-height:1.6;margin-top:5px;}
+.disc-area:focus{border-color:var(--acc);box-shadow:0 0 0 2.5px rgba(124,58,237,.12);}
+/* SIMULATOR */
+.sim-panel{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px;}
+.sim-ctrl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.sim-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.08em;display:block;margin-bottom:3px;}
+.sim-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--acc3);min-width:32px;display:inline-block;}
+input[type=range]{-webkit-appearance:none;height:5px;border-radius:3px;background:linear-gradient(90deg,#a78bfa,#e9d5ff);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--acc);box-shadow:0 2px 6px rgba(124,58,237,.35);cursor:pointer;border:2px solid #fff;}
+.btn-sim{padding:7px 16px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .17s;}
+.btn-primary{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;box-shadow:0 3px 10px rgba(109,40,217,.3);}
+.btn-primary:hover{box-shadow:0 5px 16px rgba(109,40,217,.4);}
+.btn-secondary{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.btn-secondary:hover{border-color:var(--acc);color:var(--acc);}
+.btn-exp{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;}
+.btn-log{background:linear-gradient(135deg,#065f46,#10b981);color:#fff;}
+/* CANVAS */
+#graphCanvas{width:100%;height:100%;display:block;border-radius:8px;background:#0f172a;border:1px solid var(--border);}
+/* TOOLTIP STATS */
+.sim-tip{background:rgba(15,23,42,.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px 9px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.sim-tip-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#fff;}
+.sim-tip-lbl{font-size:9.5px;color:rgba(255,255,255,.5);letter-spacing:.06em;text-transform:uppercase;}
+/* TABLE */
+.ws-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.ws-table th{background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:var(--acc3);font-weight:700;font-family:'Space Grotesk',sans-serif;padding:5px 8px;text-align:center;border:1px solid rgba(124,58,237,.15);}
+.ws-table td{padding:5px 8px;text-align:center;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);}
+.ws-table tr:nth-child(even) td{background:#faf9ff;}
+/* LOADING */
+#loadScreen{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#1e0a4f 0%,#3b0764 40%,#6d28d9 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease;
+}
+#loadScreen.hide{opacity:0;pointer-events:none;}
+.load-icon{font-size:clamp(40px,6vw,64px);margin-bottom:12px;animation:floatIcon 2.5s ease-in-out infinite;}
+@keyframes floatIcon{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.load-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,2.8vw,30px);font-weight:800;color:#fff;text-align:center;margin-bottom:4px;}
+.load-sub{font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,12px);color:#c4b5fd;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:28px;}
+.load-bar-wrap{width:clamp(220px,30vw,360px);height:6px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.load-bar-slide{height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,#60a5fa,#34d399);border-radius:6px;transition:width .1s linear;}
+.load-percent{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,1.4vw,15px);color:#fff;font-weight:700;margin-bottom:12px;text-align:center;}
+.load-status{font-size:clamp(11px,1.1vw,12px);color:#ddd6fe;margin-bottom:30px;min-height:16px;text-align:center;}
+#btnMulai{
+  display:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;border-radius:12px;
+  padding:12px 36px;font-family:'Space Grotesk',sans-serif;font-size:clamp(13px,1.4vw,15px);font-weight:700;
+  cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 20px rgba(5,150,105,.45);
+  animation:btnPop .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:transform .18s,box-shadow .18s;
+}
+#btnMulai:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 8px 28px rgba(5,150,105,.55);}
+@keyframes btnPop{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+/* SCORE OVERLAY */
+.score-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(10px);}
+.score-overlay.on{display:flex;}
+.score-box{background:#fff;border:1px solid var(--border);border-radius:16px;padding:36px 48px;text-align:center;box-shadow:0 24px 64px rgba(30,41,59,.2);animation:fu .28s ease;min-width:280px;}
+.score-big{font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:800;color:var(--acc);line-height:1;}
+.score-grade{font-size:15px;font-weight:700;margin-top:10px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* QUIZ */
+.qtext{font-size:13px;color:var(--text);line-height:1.6;font-weight:600;margin-bottom:10px;}
+.opts{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.opt{display:flex;align-items:flex-start;gap:8px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;cursor:pointer;transition:all .16s;font-size:12px;color:var(--text2);}
+.opt:hover{border-color:var(--acc2);background:#f5f3ff;color:var(--text);}
+.opt input{margin-top:2px;accent-color:var(--acc);cursor:pointer;}
+.opt.sel{border-color:var(--acc);background:#f5f3ff;color:var(--acc3);}
+.opt.correct{background:#ecfdf5;border-color:#10b981;color:#065f46;}
+.opt.wrong{background:#fff1f2;border-color:#f87171;color:#b91c1c;}
+.qfb{margin-top:8px;padding:7px 10px;border-radius:6px;font-size:11.5px;display:none;}
+.qfb.on{display:block;}
+.qfb.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;}
+.qfb.bad{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3;}
+.btn-qnav{padding:6px 14px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .17s;border:none;}
+.btn-prev{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.btn-prev:hover{border-color:var(--acc);color:var(--acc);background:#f5f3ff;}
+.btn-next{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;box-shadow:0 2px 8px rgba(109,40,217,.25);}
+.btn-next:hover{box-shadow:0 4px 14px rgba(109,40,217,.35);}
+.btn-submit-q{background:linear-gradient(135deg,#065f46,#10b981);color:#fff;}
+.btn-reset-q{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.qcounter{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text3);}
+.qprogbar{height:3px;background:var(--border);border-radius:2px;margin-bottom:8px;overflow:hidden;}
+.qprogfill{height:100%;background:linear-gradient(90deg,#8b5cf6,#60a5fa);border-radius:2px;transition:width .3s;}
+/* MISI TABS */
+.misi-tabs{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;}
+.misi-tab{padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surf2);color:var(--text2);transition:all .18s;font-family:'Space Grotesk',sans-serif;}
+.misi-tab.active{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(109,40,217,.3);}
+.misi-content{display:none;}
+.misi-content.active{display:flex;flex-direction:column;gap:6px;}
+/* GROWTH SCENARIO */
+.scenario-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all .18s;}
+.sc-growth{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;}
+.sc-growth.active{background:#1d4ed8;color:#fff;}
+.sc-decay{background:#fff7ed;color:#c2410c;border-color:#fed7aa;}
+.sc-decay.active{background:#c2410c;color:#fff;}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loadScreen">
+  <div class="load-icon">📐</div>
+  <div class="load-title">Lab Maya Matematika</div>
+  <div class="load-sub">Fungsi Eksponen &amp; Logaritma</div>
+  <div class="load-bar-wrap"><div class="load-bar-slide" id="loadBar"></div></div>
+  <div class="load-percent" id="loadPercent">0%</div>
+  <div class="load-status" id="loadStatus">Memuat modul fungsi eksponen...</div>
+  <button id="btnMulai" onclick="startLab()">🚀 Mulai Praktikum</button>
+</div>
+
+<audio id="clickSfx" src="https://denicendrianto41.github.io/jump.wav" preload="auto"></audio>
+<audio id="startSfx" src="https://denicendrianto41.github.io/tring.wav" preload="auto"></audio>
+
+<script>
+(function(){
+  const bar=document.getElementById('loadBar');
+  const pct=document.getElementById('loadPercent');
+  const status=document.getElementById('loadStatus');
+  const msgs=['Memuat modul fungsi eksponen...','Menginisialisasi grafik interaktif...','Menyiapkan simulator pertumbuhan...','Membangun lembar kerja digital...','✅ Laboratorium siap digunakan!'];
+  let cur=0;
+  const total=3000,step=20;
+  const inc=100/(total/step);
+  let idx=0;
+  const iv=setInterval(()=>{
+    cur=Math.min(100,cur+inc);
+    const v=Math.floor(cur);
+    bar.style.width=v+'%';
+    pct.textContent=v+'%';
+    const mi=Math.min(4,Math.floor(v/25));
+    if(mi!==idx){idx=mi;status.textContent=msgs[idx];}
+    if(cur>=100){
+      clearInterval(iv);
+      status.textContent=msgs[4];
+      document.getElementById('btnMulai').style.display='block';
+    }
+  },step);
+})();
+function startLab(){
+  document.getElementById('startSfx').play().catch(()=>{});
+  const ls=document.getElementById('loadScreen');
+  ls.classList.add('hide');
+  setTimeout(()=>{ls.style.display='none';},650);
+}
+document.addEventListener('click',function(e){
+  const el=e.target.closest('button,.nb,.misi-tab,.scenario-chip,.opt');
+  if(!el||el.id==='btnMulai') return;
+  const sfx=document.getElementById('clickSfx');
+  if(sfx){sfx.currentTime=0;sfx.play().catch(()=>{});}
+});
+</script>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧮</div>
+    <div>
+      <div class="logo-text">Lab Maya Matematika</div>
+      <div class="logo-sub">Eksponen &amp; Logaritma</div>
+    </div>
+  </div>
+  <button id="menuToggle" onclick="toggleNav()" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <nav id="mainNav">
+    <button class="nb active" onclick="show('teori',this);closeNav()"><span class="nb-icon">📚</span>Teori</button>
+    <button class="nb" onclick="show('prosedur',this);closeNav()"><span class="nb-icon">📋</span>Prosedur</button>
+    <button class="nb" onclick="show('simulasi',this);closeNav()"><span class="nb-icon">📈</span>Lab Grafik</button>
+    <button class="nb" onclick="show('ekspedisi',this);closeNav()"><span class="nb-icon">🧬</span>Ekspedisi</button>
+    <button class="nb" onclick="show('diskusi',this);closeNav()"><span class="nb-icon">💬</span>Diskusi</button>
+    <button class="nb" onclick="show('kuis',this);closeNav()"><span class="nb-icon">🏆</span>Kuis</button>
+  </nav>
+</header>
+
+<div id="app">
+
+<!-- ═══════════════ TEORI ═══════════════ -->
+<div id="page-teori" class="page active">
+  <div class="scroll">
+    <div class="hero">
+      <div>
+        <div class="h-label">Tujuan Pembelajaran</div>
+        <div class="h-title">Mengenal <span>Fungsi Eksponen</span> &amp; Logaritma</div>
+        <div class="h-desc">Memahami sifat, grafik, dan aplikasi fungsi eksponensial dan logaritma serta menggunakannya untuk memodelkan berbagai fenomena dunia nyata.</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="ch"><div class="ci b">🎯</div><div class="ct">Tujuan Pembelajaran</div></div>
+        <ul class="olist">
+          <li>Memahami definisi dan sifat fungsi eksponensial f(x) = bˣ</li>
+          <li>Memahami definisi dan sifat fungsi logaritma g(x) = log<sub>b</sub>(x)</li>
+          <li>Menjelaskan hubungan invers keduanya melalui garis y = x</li>
+          <li>Menggunakan model eksponensial untuk fenomena pertumbuhan &amp; peluruhan</li>
+          <li>Menerapkan logaritma alami untuk menentukan waktu dalam model pertumbuhan</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci g">🏆</div><div class="ct">Hasil Belajar</div></div>
+        <ul class="olist">
+          <li>Menggambar &amp; menganalisis grafik fungsi eksponen dan logaritma</li>
+          <li>Mengidentifikasi asimtot dan domain fungsi</li>
+          <li>Membuktikan bahwa eksponen dan logaritma adalah fungsi invers</li>
+          <li>Memodelkan pertumbuhan bakteri dengan P(t) = P₀·eʳᵗ</li>
+          <li>Menghitung waktu menggunakan rumus t = ln(P/P₀)/r</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="ch"><div class="ci p">📘</div><div class="ct">Fungsi Eksponensial</div></div>
+        <p><strong style="color:var(--acc-exp)">Fungsi eksponensial</strong> didefinisikan sebagai f(x) = bˣ, di mana b adalah basis (b &gt; 0, b ≠ 1).</p>
+        <div class="formula-box">f(x) = bˣ &nbsp;|&nbsp; b &gt; 0, b ≠ 1</div>
+        <h4>Sifat Utama</h4>
+        <p>Domain: semua bilangan real (-∞, +∞). Range: bilangan positif (0, +∞). Grafik selalu memotong sumbu-Y di titik (0, 1) karena b⁰ = 1.</p>
+        <h4>Asimtot</h4>
+        <p>Grafik mendekati garis <strong>y = 0</strong> (sumbu-X) namun tidak pernah menyentuhnya. Garis y = 0 adalah <em>asimtot horizontal</em>.</p>
+        <h4>Pengaruh Nilai b</h4>
+        <p>Jika <strong>b &gt; 1</strong>: grafik naik (pertumbuhan eksponensial). Jika <strong>0 &lt; b &lt; 1</strong>: grafik turun (peluruhan eksponensial). Semakin besar b, semakin curam kurva.</p>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci g">📗</div><div class="ct">Fungsi Logaritma</div></div>
+        <p><strong style="color:var(--acc-log)">Fungsi logaritma</strong> adalah invers dari fungsi eksponen. Jika bˣ = y, maka log<sub>b</sub>(y) = x.</p>
+        <div class="formula-box">g(x) = log<sub>b</sub>(x) &nbsp;|&nbsp; x &gt; 0</div>
+        <h4>Sifat Utama</h4>
+        <p>Domain: bilangan positif (0, +∞). Range: semua bilangan real (-∞, +∞). Grafik selalu memotong sumbu-X di titik (1, 0) karena log<sub>b</sub>(1) = 0.</p>
+        <h4>Asimtot</h4>
+        <p>Grafik mendekati garis <strong>x = 0</strong> (sumbu-Y) namun tidak pernah menyentuhnya. Garis x = 0 adalah <em>asimtot vertikal</em>.</p>
+        <h4>Logaritma Alami</h4>
+        <p>Basis spesial: bilangan Euler <strong>e ≈ 2.718</strong>. Disebut <em>logaritma alami</em> dan ditulis ln(x). Sangat berguna dalam pemodelan fenomena alam.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci b">🔗</div><div class="ct">Hubungan Invers: Cermin Ajaib</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:start;">
+        <div>
+          <h4>Sifat Invers</h4>
+          <p>Fungsi eksponen dan logaritma merupakan <strong>fungsi invers satu sama lain</strong>. Jika kamu mencerminkan grafik f(x) = bˣ terhadap garis y = x, kamu akan mendapatkan grafik g(x) = log<sub>b</sub>(x).</p>
+          <div class="formula-box">b^(log_b(x)) = x<br>log_b(b^x) = x</div>
+        </div>
+        <div>
+          <h4>Pertukaran Koordinat</h4>
+          <p>Jika titik (a, b) ada di grafik eksponen, maka titik (b, a) ada di grafik logaritma. Contoh: titik (3, 8) ada di grafik f(x) = 2ˣ, maka titik (8, 3) ada di grafik g(x) = log₂(x).</p>
+          <p>Ini terjadi karena 2³ = 8 dan log₂(8) = 3.</p>
+        </div>
+        <div>
+          <h4>Tabel Perbandingan</h4>
+          <div style="font-size:11px;color:var(--text2);">
+            <table style="width:100%;border-collapse:collapse;">
+              <tr style="background:#f5f3ff;"><th style="padding:4px 6px;text-align:left;font-size:10px;color:var(--acc3);font-family:'Space Grotesk',sans-serif;">Fitur</th><th style="padding:4px 6px;text-align:center;font-size:10px;color:#1d4ed8;">Eksponen</th><th style="padding:4px 6px;text-align:center;font-size:10px;color:#065f46;">Logaritma</th></tr>
+              <tr><td style="padding:3px 6px;border:1px solid var(--border);">Domain</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(-∞,+∞)</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(0,+∞)</td></tr>
+              <tr><td style="padding:3px 6px;border:1px solid var(--border);">Range</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(0,+∞)</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(-∞,+∞)</td></tr>
+              <tr><td style="padding:3px 6px;border:1px solid var(--border);">Asimtot</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">y = 0</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">x = 0</td></tr>
+              <tr><td style="padding:3px 6px;border:1px solid var(--border);">Potong sumbu</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(0,1)</td><td style="padding:3px 6px;border:1px solid var(--border);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;">(1,0)</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PROSEDUR ═══════════════ -->
+<div id="page-prosedur" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px;display:flex;flex-direction:column;gap:7px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:1;min-height:0;">
+      <div class="card" style="margin-bottom:0;overflow:auto;">
+        <div class="ch"><div class="ci b">🔭</div><div class="ct">Misi 1: Detektif Grafik</div></div>
+        <div style="font-size:10px;font-weight:700;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Eksplorasi Fungsi Eksponen &amp; Logaritma</div>
+        <div id="simSteps1"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;min-height:0;">
+        <div class="card" style="margin-bottom:0;flex:1;overflow:auto;">
+          <div class="ch"><div class="ci g">🧬</div><div class="ct">Misi 2: Ekspedisi Growth &amp; Decay</div></div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc-log);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Memodelkan Fenomena Dunia Nyata</div>
+          <div id="simSteps2"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;flex-shrink:0;border-color:rgba(248,113,113,.25);">
+          <div class="ch"><div class="ci r">⚠️</div><div class="ct" style="color:var(--red)">Catatan Penting</div></div>
+          <ul class="olist" style="font-size:11px;">
+            <li>Eksplorasi <strong>satu variabel</strong> pada satu waktu agar perbandingan valid</li>
+            <li>Catat setiap perubahan grafik di lembar kerja diskusi</li>
+            <li>Gunakan kalkulator untuk memverifikasi hasil hitungan</li>
+            <li>Perhatikan asimtot — grafik tidak pernah melewatinya!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LAB GRAFIK (SIMULASI) ═══════════════ -->
+<div id="page-simulasi" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px;display:flex;flex-direction:column;gap:7px;">
+    <!-- Kontrol atas -->
+    <div class="sim-panel" style="flex-shrink:0;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <span class="sim-label">Basis (b)</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="range" id="sliderB" min="0.1" max="5" step="0.05" value="2" style="width:120px;" oninput="updateBVal();drawGraph()">
+            <span class="sim-val" id="valB">2.00</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <span class="sim-label" style="margin-bottom:0;">Tampilkan:</span>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:var(--acc-exp);">
+            <input type="checkbox" id="chkExp" checked onchange="drawGraph()" style="accent-color:#2563eb;"> <span style="font-family:'JetBrains Mono',monospace;font-weight:600;">bˣ</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:var(--acc-log);">
+            <input type="checkbox" id="chkLog" onchange="drawGraph()" style="accent-color:#059669;"> <span style="font-family:'JetBrains Mono',monospace;font-weight:600;">log_b(x)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:#94a3b8;">
+            <input type="checkbox" id="chkMirror" onchange="drawGraph()" style="accent-color:#8b5cf6;"> <span style="font-family:'JetBrains Mono',monospace;font-weight:600;">y=x</span>
+          </label>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:5px;">
+          <button class="btn-sim btn-secondary" onclick="resetGraph()">↺ Reset</button>
+          <button class="btn-sim btn-primary" onclick="toggleTracer()">📍 Tracer</button>
+        </div>
+      </div>
+    </div>
+    <!-- Area grafik + info -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 260px;gap:7px;min-height:0;">
+      <div style="position:relative;min-height:0;">
+        <canvas id="graphCanvas"></canvas>
+        <div id="tracerInfo" style="position:absolute;top:10px;left:10px;display:none;flex-direction:column;gap:4px;">
+          <div class="sim-tip"><span class="sim-tip-val" id="tipX">-</span><span class="sim-tip-lbl">x</span></div>
+          <div class="sim-tip"><span class="sim-tip-val" id="tipExpY">-</span><span class="sim-tip-lbl" style="color:#60a5fa;">bˣ</span></div>
+          <div class="sim-tip" id="tipLogWrap"><span class="sim-tip-val" id="tipLogY">-</span><span class="sim-tip-lbl" style="color:#34d399;">log_b(x)</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;overflow-y:auto;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci b" style="font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:700;">f(x)</div><div class="ct" style="color:#1d4ed8;">Eksponen</div></div>
+          <div class="formula-box">f(x) = b<span id="infoB1">2</span><sup>x</sup></div>
+          <p style="font-size:11px;"><strong>Potong Y:</strong> <span style="font-family:'JetBrains Mono',monospace;">(0, 1)</span></p>
+          <p style="font-size:11px;"><strong>Asimtot:</strong> <span style="font-family:'JetBrains Mono',monospace;">y = 0</span></p>
+          <p style="font-size:11px;" id="infoExpBehavior"><strong>Perilaku:</strong> Naik (b &gt; 1)</p>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci g" style="font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:700;">g(x)</div><div class="ct" style="color:#059669;">Logaritma</div></div>
+          <div class="formula-box">g(x) = log<sub id="infoB2">2</sub>(x)</div>
+          <p style="font-size:11px;"><strong>Potong X:</strong> <span style="font-family:'JetBrains Mono',monospace;">(1, 0)</span></p>
+          <p style="font-size:11px;"><strong>Asimtot:</strong> <span style="font-family:'JetBrains Mono',monospace;">x = 0</span></p>
+          <p style="font-size:11px;" id="infoLogBehavior"><strong>Perilaku:</strong> Naik (b &gt; 1)</p>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci b">💡</div><div class="ct">Fakta Menarik</div></div>
+          <p style="font-size:11px;" id="factBox">Coba geser slider b ke nilai 1. Apa yang terjadi?</p>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci y">📊</div><div class="ct">Tabel Nilai</div></div>
+          <table class="ws-table" id="valueTable" style="font-size:10.5px;">
+            <thead><tr><th>x</th><th style="color:#3b82f6;">bˣ</th><th style="color:#10b981;">log_b(x)</th></tr></thead>
+            <tbody id="valueTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ EKSPEDISI GROWTH & DECAY ═══════════════ -->
+<div id="page-ekspedisi" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px;display:flex;flex-direction:column;gap:7px;">
+    <div class="hero" style="padding:10px 16px;margin-bottom:0;flex-shrink:0;">
+      <div>
+        <div class="h-label">🧬 Skenario Lab</div>
+        <div class="h-title">Ekspedisi <span>Digital Growth &amp; Decay</span></div>
+        <div class="h-desc">Kamu adalah peneliti yang memodelkan pertumbuhan koloni bakteri. Gunakan P(t) = P₀·eʳᵗ dan tentukan waktu pemberian vaksin.</div>
+      </div>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0;overflow:hidden;">
+      <!-- Kontrol simulasi -->
+      <div style="display:flex;flex-direction:column;gap:7px;min-height:0;overflow:auto;">
+        <div class="sim-panel">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+            <div>
+              <span class="sim-label">Populasi Awal (P₀)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="sliderP0" min="50" max="1000" step="50" value="100" style="width:100px;" oninput="updateExpSim()">
+                <span class="sim-val" id="valP0">100</span>
+              </div>
+            </div>
+            <div>
+              <span class="sim-label">Laju (r)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="sliderR" min="-0.8" max="0.8" step="0.05" value="0.5" style="width:100px;" oninput="updateExpSim()">
+                <span class="sim-val" id="valR">0.50</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;">
+              <span class="scenario-chip sc-growth" id="scGrowth" onclick="setScenario('growth')">📈 Pertumbuhan</span>
+              <span class="scenario-chip sc-decay" id="scDecay" onclick="setScenario('decay')">📉 Peluruhan</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+            <div>
+              <span class="sim-label">Target Populasi (Vaksin)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="sliderTarget" min="500" max="20000" step="500" value="5000" style="width:100px;" oninput="updateExpSim()">
+                <span class="sim-val" id="valTarget">5000</span>
+              </div>
+            </div>
+          </div>
+          <canvas id="expCanvas" style="width:100%;height:180px;border-radius:8px;background:#0f172a;border:1px solid var(--border);display:block;"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci y">🧮</div><div class="ct">Kalkulator Waktu</div></div>
+          <p style="font-size:11.5px;">Untuk mencapai target populasi:</p>
+          <div class="formula-box" id="calcFormula" style="font-size:11.5px;">t = ln(P/P₀) / r</div>
+          <div style="margin-top:6px;padding:8px;background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;border-radius:7px;text-align:center;">
+            <div style="font-size:10px;color:var(--acc-log);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Waktu yang dibutuhkan</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#065f46;" id="calcResult">—</div>
+            <div style="font-size:10px;color:#64748b;">satuan waktu</div>
+          </div>
+        </div>
+      </div>
+      <!-- Tabel & analisis -->
+      <div style="display:flex;flex-direction:column;gap:7px;min-height:0;overflow:auto;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci b">📊</div><div class="ct">Tabel Pengamatan Pertumbuhan</div></div>
+          <table class="ws-table" id="expTable">
+            <thead><tr><th>Laju (r)</th><th>t=5</th><th>t=10</th><th>t=20</th><th>Perilaku</th></tr></thead>
+            <tbody id="expTbody"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci g">🎯</div><div class="ct">Tabel Misi Penyelamatan (r = 0.5)</div></div>
+          <table class="ws-table">
+            <thead><tr><th>Target (P)</th><th>Persamaan</th><th>Waktu (t)</th></tr></thead>
+            <tbody>
+              <tr><td>1.000</td><td style="font-size:10px;">1000=100·e^(0.5t)</td><td style="color:var(--acc-log);font-weight:700;" id="t1000">—</td></tr>
+              <tr><td>5.000</td><td style="font-size:10px;">5000=100·e^(0.5t)</td><td style="color:var(--acc-log);font-weight:700;" id="t5000">—</td></tr>
+              <tr><td>10.000</td><td style="font-size:10px;">10000=100·e^(0.5t)</td><td style="color:var(--acc-log);font-weight:700;" id="t10000">—</td></tr>
+              <tr><td>20.000</td><td style="font-size:10px;">20000=100·e^(0.5t)</td><td style="color:var(--acc-log);font-weight:700;" id="t20000">—</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:6px;padding:7px 10px;background:#fef3c7;border:1px solid #fde68a;border-radius:7px;font-size:11px;color:#92400e;">
+            💡 <strong>Perhatikan:</strong> Saat target naik 10×, apakah waktu juga naik 10×? Mengapa? Inilah keajaiban fungsi logaritma!
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="ch"><div class="ci r">🔬</div><div class="ct">Keputusan Peneliti</div></div>
+          <p style="font-size:11.5px;">Dengan <span style="font-family:'JetBrains Mono',monospace;color:var(--acc);">r = 0.5</span> dan kapasitas lab <strong>20.000 bakteri</strong>, vaksin harus disuntikkan pada:</p>
+          <div style="padding:8px;background:#fff0f3;border:1px solid #fecdd3;border-radius:7px;text-align:center;margin-top:6px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#b91c1c;">t ≈ <span id="tVaksin">—</span></div>
+            <div style="font-size:10px;color:#64748b;">satuan waktu (sebelum kebocoran!)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DISKUSI ═══════════════ -->
+<div id="page-diskusi" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--acc);text-transform:uppercase;">Lembar Kerja</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:clamp(16px,2vw,20px);font-weight:800;color:var(--acc3);">Diskusi <span style="color:var(--acc2)">Hasil Eksplorasi</span></div>
+      </div>
+      <button class="btn-qnav btn-reset-q" onclick="clearDQ()" style="border:1px solid var(--border);font-size:11px;padding:5px 12px;">↺ Hapus Jawaban</button>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:6px;min-height:0;">
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+        <div class="ch" style="margin-bottom:4px;"><div class="ci b" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">1</div><div class="ct" style="font-size:clamp(12px,1.3vw,14px);">Apa yang terjadi pada grafik f(x) = bˣ saat nilai b semakin besar? Mengapa grafik tidak pernah melewati sumbu-X?</div></div>
+        <textarea class="disc-area" placeholder="Tuliskan pengamatanmu..." oninput="saveDQ(1,this.value)" id="dq1" style="flex:1;resize:none;min-height:0;"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+        <div class="ch" style="margin-bottom:4px;"><div class="ci g" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">2</div><div class="ct" style="font-size:clamp(12px,1.3vw,14px);">Mengapa fungsi logaritma tidak terdefinisi untuk x ≤ 0? Apa hubungannya dengan domain fungsi eksponen?</div></div>
+        <textarea class="disc-area" placeholder="Jelaskan alasannya..." oninput="saveDQ(2,this.value)" id="dq2" style="flex:1;resize:none;min-height:0;"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+        <div class="ch" style="margin-bottom:4px;"><div class="ci b" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">3</div><div class="ct" style="font-size:clamp(12px,1.3vw,14px);">Buktikan dengan sebuah titik bahwa grafik eksponen dan logaritma merupakan cerminan terhadap garis y = x!</div></div>
+        <textarea class="disc-area" placeholder="Contoh: titik (3,8) di grafik 2ˣ, maka (8,3) di log₂(x)..." oninput="saveDQ(3,this.value)" id="dq3" style="flex:1;resize:none;min-height:0;"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+        <div class="ch" style="margin-bottom:4px;"><div class="ci y" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">4</div><div class="ct" style="font-size:clamp(12px,1.3vw,14px);">Saat target populasi naik 10× lipat (dari 1.000 ke 10.000), apakah waktu t juga naik 10× lipat? Jelaskan!</div></div>
+        <textarea class="disc-area" placeholder="Gunakan tabel di halaman Ekspedisi..." oninput="saveDQ(4,this.value)" id="dq4" style="flex:1;resize:none;min-height:0;"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;grid-column:span 2;">
+        <div class="ch" style="margin-bottom:4px;"><div class="ci b" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">5</div><div class="ct" style="font-size:clamp(12px,1.3vw,14px);">Kesimpulan: Fungsi eksponen dan logaritma sebenarnya adalah... (tuliskan kesimpulanmu sendiri tentang hubungan keduanya)</div></div>
+        <textarea class="disc-area" placeholder="Fungsi eksponen dan logaritma sebenarnya adalah..." oninput="saveDQ(5,this.value)" id="dq5" style="flex:1;resize:none;min-height:0;"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ KUIS ═══════════════ -->
+<div id="page-kuis" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--acc);text-transform:uppercase;">Evaluasi</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:clamp(15px,2vw,20px);font-weight:800;color:var(--acc3);">Kuis <span style="color:var(--acc2)">Eksponen &amp; Logaritma</span></div>
+      </div>
+      <button class="btn-qnav btn-reset-q" onclick="resetQuiz()" style="border:1px solid var(--border);font-size:11px;padding:5px 12px;">↺ Ulangi Kuis</button>
+    </div>
+    <div class="qprogbar"><div class="qprogfill" id="qProgFill" style="width:0%"></div></div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;min-height:0;" id="quizGrid">
+      <!-- Questions inserted by JS -->
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;padding-top:2px;">
+      <button class="btn-qnav btn-prev" id="btnPrev" onclick="prevQ()" style="display:none;">← Sebelumnya</button>
+      <button class="btn-qnav btn-next" id="btnNextQ" onclick="nextQ()">Lanjut →</button>
+      <button class="btn-qnav btn-submit-q" id="btnSubmitQ" onclick="submitQuiz()" style="display:none;">✓ Kumpulkan</button>
+      <div class="qcounter" id="qCounter">Soal 1 / 8</div>
+    </div>
+  </div>
+</div>
+
+<!-- Score Overlay -->
+<div class="score-overlay" id="scoreOverlay">
+  <div class="score-box">
+    <div style="font-size:32px;margin-bottom:8px;">🏆</div>
+    <div class="score-big" id="scoreBig">0</div>
+    <div style="font-size:14px;color:var(--text3);margin-top:2px;" id="scorePct"></div>
+    <div class="score-grade" id="scoreGrade"></div>
+    <div style="font-size:12px;color:var(--text2);margin-top:8px;">Pertahankan semangatmu!</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:18px;">
+      <button class="btn-sim btn-secondary" onclick="document.getElementById('scoreOverlay').classList.remove('on')" style="border:1px solid var(--border);">📋 Review</button>
+      <button class="btn-sim btn-primary" onclick="resetQuiz();document.getElementById('scoreOverlay').classList.remove('on')">↺ Ulangi</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ─────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────
+function toggleNav(){document.getElementById('mainNav').classList.toggle('open');}
+function closeNav(){document.getElementById('mainNav').classList.remove('open');}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('nav')&&!e.target.closest('#menuToggle'))closeNav();
+});
+function show(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='simulasi'){setTimeout(()=>{resizeGraphCanvas();drawGraph();},40);}
+  if(id==='ekspedisi'){setTimeout(()=>{resizeExpCanvas();updateExpSim();},40);}
+}
+
+// ─────────────────────────────────────────────
+// PROSEDUR STEPS
+// ─────────────────────────────────────────────
+const steps1=[
+  {icon:'🔭',text:'Buka halaman <strong>Lab Grafik</strong> dan aktifkan fungsi eksponen bˣ.'},
+  {icon:'🎚️',text:'Geser slider <strong>b</strong> dari 1.1 hingga 5. Amati bentuk kurva yang berubah.'},
+  {icon:'📉',text:'Geser slider b ke antara 0 dan 1 (misal 0.5). Perhatikan kurva berbalik arah!'},
+  {icon:'🔍',text:'Aktifkan fungsi logaritma log_b(x) sekaligus dengan eksponen.'},
+  {icon:'📏',text:'Aktifkan garis bantu <strong>y = x</strong> dan amati simetri kedua grafik.'},
+  {icon:'📌',text:'Gunakan <strong>Tracer</strong> untuk menemukan titik di kedua grafik dan verifikasi pertukaran koordinat.'},
+  {icon:'📝',text:'Catat temuanmu di halaman <strong>Diskusi</strong>.'},
+];
+const steps2=[
+  {icon:'🧪',text:'Buka halaman <strong>Ekspedisi</strong> dan atur P₀ = 100.'},
+  {icon:'📈',text:'Ubah nilai r dengan slider dan amati tabel pengamatan secara otomatis.'},
+  {icon:'🦠',text:'Pilih skenario <strong>Pertumbuhan</strong> dan amati grafik eksponensial naik.'},
+  {icon:'📉',text:'Pilih skenario <strong>Peluruhan</strong> (r negatif) dan amati perbedaannya.'},
+  {icon:'🎯',text:'Atur target populasi vaksin dan baca <strong>waktu</strong> dari kalkulator otomatis.'},
+  {icon:'📊',text:'Bandingkan t untuk target 1.000, 5.000, dan 10.000 pada tabel misi.'},
+  {icon:'✍️',text:'Jawab pertanyaan analisis di halaman <strong>Diskusi</strong>.'},
+];
+function buildSteps(data,id){
+  const colors=['#7c3aed','#2563eb','#0891b2','#059669','#d97706','#dc2626','#9333ea'];
+  const el=document.getElementById(id);
+  el.innerHTML=data.map((s,i)=>{
+    const c=colors[i%colors.length];
+    const nc=colors[(i+1)%colors.length];
+    const isLast=i===data.length-1;
+    return `<div style="display:flex;align-items:flex-start;gap:0;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;z-index:1;margin-right:10px;">
+        <div style="width:34px;height:34px;border-radius:50%;background:${c};border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px ${c}55;flex-shrink:0;font-size:16px;">${s.icon}</div>
+        ${!isLast?`<div style="width:0;flex:1;min-height:14px;border-left:2.5px dashed ${nc}77;margin-top:4px;margin-bottom:4px;"></div>`:''}
+      </div>
+      <div style="flex:1;background:${c}10;border:1.5px solid ${c}30;border-radius:8px;padding:6px 10px;margin-bottom:${isLast?0:6}px;">
+        <div style="font-size:9px;font-weight:700;color:${c};letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">Langkah ${i+1}</div>
+        <p style="font-size:clamp(11px,1.1vw,12.5px);color:var(--text2);margin:0;line-height:1.5;">${s.text}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+buildSteps(steps1,'simSteps1');
+buildSteps(steps2,'simSteps2');
+
+// ─────────────────────────────────────────────
+// LAB GRAFIK
+// ─────────────────────────────────────────────
+const gc=document.getElementById('graphCanvas');
+const gctx=gc.getContext('2d');
+let tracerActive=false;
+let mouseGX=0;
+
+function resizeGraphCanvas(){
+  gc.width=gc.offsetWidth;
+  gc.height=gc.offsetHeight||gc.offsetWidth*0.55;
+}
+function updateBVal(){
+  const b=parseFloat(document.getElementById('sliderB').value);
+  document.getElementById('valB').textContent=b.toFixed(2);
+  document.getElementById('infoB1').textContent=b.toFixed(2);
+  document.getElementById('infoB2').textContent=b.toFixed(2);
+  // behaviors
+  const beh = b>1?'Naik (b > 1)':'Turun (0 < b < 1)';
+  document.getElementById('infoExpBehavior').innerHTML='<strong>Perilaku:</strong> '+beh;
+  document.getElementById('infoLogBehavior').innerHTML='<strong>Perilaku:</strong> '+beh;
+  // facts
+  let fact='';
+  if(Math.abs(b-1)<0.06) fact='⚠️ Saat b=1, f(x)=1 untuk semua x — garis lurus horizontal! Ini bukan fungsi eksponen sejati.';
+  else if(b>3) fact='📈 Basis besar = pertumbuhan sangat cepat! Berguna untuk memodelkan fenomena viral.';
+  else if(b<0.5) fact='📉 Basis antara 0 dan 1 = peluruhan! Cocok untuk memodelkan waktu paruh radioaktif.';
+  else fact='💡 Coba geser slider ke b=1. Apa yang terjadi pada grafiknya?';
+  document.getElementById('factBox').textContent=fact;
+  updateValueTable(b);
+}
+function updateValueTable(b){
+  const rows=[-3,-2,-1,0,1,2,3];
+  const tb=document.getElementById('valueTbody');
+  tb.innerHTML=rows.map(x=>{
+    const expV=Math.pow(b,x).toFixed(3);
+    const logV=x>0?(Math.log(x)/Math.log(b)).toFixed(3):'—';
+    return `<tr><td>${x}</td><td style="color:#60a5fa;">${expV}</td><td style="color:#34d399;">${logV}</td></tr>`;
+  }).join('');
+}
+function resetGraph(){
+  document.getElementById('sliderB').value=2;
+  document.getElementById('chkExp').checked=true;
+  document.getElementById('chkLog').checked=false;
+  document.getElementById('chkMirror').checked=false;
+  updateBVal();drawGraph();
+}
+function toggleTracer(){
+  tracerActive=!tracerActive;
+  document.getElementById('tracerInfo').style.display=tracerActive?'flex':'none';
+}
+function drawGraph(){
+  if(!gc.width||!gc.offsetWidth){resizeGraphCanvas();}
+  const W=gc.width,H=gc.height;
+  const b=parseFloat(document.getElementById('sliderB').value);
+  const showExp=document.getElementById('chkExp').checked;
+  const showLog=document.getElementById('chkLog').checked;
+  const showMirror=document.getElementById('chkMirror').checked;
+  gctx.clearRect(0,0,W,H);
+  // Background
+  gctx.fillStyle='#0f172a';
+  gctx.fillRect(0,0,W,H);
+  // Grid setup: map x in [-5,5] and y in [-4,6] to canvas
+  const xMin=-5,xMax=5,yMin=-4,yMax=6;
+  function toCanvasX(x){return (x-xMin)/(xMax-xMin)*W;}
+  function toCanvasY(y){return H-(y-yMin)/(yMax-yMin)*H;}
+  function fromCanvasX(cx){return cx/W*(xMax-xMin)+xMin;}
+  // Grid lines
+  gctx.strokeStyle='rgba(148,163,184,0.1)';gctx.lineWidth=1;
+  for(let x=-5;x<=5;x++){
+    gctx.beginPath();gctx.moveTo(toCanvasX(x),0);gctx.lineTo(toCanvasX(x),H);gctx.stroke();
+  }
+  for(let y=-4;y<=6;y++){
+    gctx.beginPath();gctx.moveTo(0,toCanvasY(y));gctx.lineTo(W,toCanvasY(y));gctx.stroke();
+  }
+  // Axes
+  gctx.strokeStyle='rgba(255,255,255,0.35)';gctx.lineWidth=1.5;
+  gctx.beginPath();gctx.moveTo(toCanvasX(0),0);gctx.lineTo(toCanvasX(0),H);gctx.stroke();
+  gctx.beginPath();gctx.moveTo(0,toCanvasY(0));gctx.lineTo(W,toCanvasY(0));gctx.stroke();
+  // Axis labels
+  gctx.fillStyle='rgba(148,163,184,0.7)';gctx.font='10px JetBrains Mono,monospace';gctx.textAlign='center';
+  for(let x=-4;x<=4;x+=1){if(x===0)continue;
+    gctx.fillText(x,toCanvasX(x),toCanvasY(0)+14);
+  }
+  gctx.textAlign='right';
+  for(let y=-3;y<=5;y+=1){if(y===0)continue;
+    gctx.fillText(y,toCanvasX(0)-5,toCanvasY(y)+4);
+  }
+  gctx.fillStyle='rgba(255,255,255,0.5)';gctx.font='bold 11px JetBrains Mono,monospace';
+  gctx.textAlign='center';gctx.fillText('x',W-12,toCanvasY(0)-6);
+  gctx.textAlign='left';gctx.fillText('y',toCanvasX(0)+6,12);
+  gctx.textAlign='center';gctx.fillText('0',toCanvasX(0)-8,toCanvasY(0)+14);
+  // Mirror line y=x
+  if(showMirror){
+    gctx.setLineDash([8,4]);gctx.strokeStyle='rgba(167,139,250,0.5)';gctx.lineWidth=1.5;
+    gctx.beginPath();
+    const xS=fromCanvasX(0),yS=xS;
+    gctx.moveTo(0,toCanvasY(fromCanvasX(0)));
+    gctx.lineTo(W,toCanvasY(fromCanvasX(W)));
+    gctx.stroke();
+    gctx.setLineDash([]);
+    gctx.fillStyle='rgba(167,139,250,0.8)';gctx.font='11px Plus Jakarta Sans,sans-serif';gctx.textAlign='left';
+    gctx.fillText('y = x',toCanvasX(3.5)+4,toCanvasY(3.5)-6);
+  }
+  // Exponential f(x) = b^x
+  if(showExp){
+    gctx.strokeStyle='#60a5fa';gctx.lineWidth=2.5;
+    gctx.shadowColor='rgba(96,165,250,0.4)';gctx.shadowBlur=8;
+    gctx.beginPath();let first=true;
+    for(let px=0;px<=W;px+=1){
+      const x=fromCanvasX(px);
+      const y=Math.pow(b,x);
+      if(y<yMin||y>yMax){first=true;continue;}
+      const cy=toCanvasY(y);
+      if(first){gctx.moveTo(px,cy);first=false;}
+      else gctx.lineTo(px,cy);
+    }
+    gctx.stroke();gctx.shadowBlur=0;
+    // Label
+    gctx.fillStyle='#93c5fd';gctx.font='bold 11px JetBrains Mono,monospace';gctx.textAlign='left';
+    const labelX=Math.min(W-80,toCanvasX(2.5));
+    const labelY=toCanvasY(Math.min(5.5,Math.pow(b,2.5)));
+    gctx.fillText('f(x)=b^x',labelX+4,labelY-8);
+    // Asymptote label
+    gctx.strokeStyle='rgba(96,165,250,0.3)';gctx.lineWidth=1;gctx.setLineDash([4,3]);
+    gctx.beginPath();gctx.moveTo(0,toCanvasY(0));gctx.lineTo(W,toCanvasY(0));gctx.stroke();
+    gctx.setLineDash([]);
+    gctx.fillStyle='rgba(96,165,250,0.5)';gctx.font='9px JetBrains Mono';gctx.textAlign='right';
+    gctx.fillText('y=0 (asimtot)',W-6,toCanvasY(0)-4);
+  }
+  // Logarithm g(x) = log_b(x)
+  if(showLog){
+    gctx.strokeStyle='#34d399';gctx.lineWidth=2.5;
+    gctx.shadowColor='rgba(52,211,153,0.4)';gctx.shadowBlur=8;
+    gctx.beginPath();let first2=true;
+    for(let px=0;px<=W;px+=1){
+      const x=fromCanvasX(px);
+      if(x<=0){first2=true;continue;}
+      const y=Math.log(x)/Math.log(b);
+      if(y<yMin||y>yMax){first2=true;continue;}
+      const cy=toCanvasY(y);
+      if(first2){gctx.moveTo(px,cy);first2=false;}
+      else gctx.lineTo(px,cy);
+    }
+    gctx.stroke();gctx.shadowBlur=0;
+    // Label
+    gctx.fillStyle='#6ee7b7';gctx.font='bold 11px JetBrains Mono,monospace';gctx.textAlign='left';
+    const lbX=toCanvasX(2.5),lbY=toCanvasY(Math.log(2.5)/Math.log(b));
+    if(lbY>0&&lbY<H)gctx.fillText('g(x)=log(x)',lbX+4,lbY+16);
+    // Asymptote
+    gctx.strokeStyle='rgba(52,211,153,0.3)';gctx.lineWidth=1;gctx.setLineDash([4,3]);
+    gctx.beginPath();gctx.moveTo(toCanvasX(0),0);gctx.lineTo(toCanvasX(0),H);gctx.stroke();
+    gctx.setLineDash([]);
+    gctx.fillStyle='rgba(52,211,153,0.5)';gctx.font='9px JetBrains Mono';gctx.textAlign='left';
+    gctx.fillText('x=0 (asimtot)',toCanvasX(0)+4,16);
+  }
+  // Tracer
+  if(tracerActive){
+    const tx=fromCanvasX(mouseGX);
+    gctx.strokeStyle='rgba(255,255,255,0.3)';gctx.lineWidth=1;gctx.setLineDash([3,3]);
+    gctx.beginPath();gctx.moveTo(mouseGX,0);gctx.lineTo(mouseGX,H);gctx.stroke();
+    gctx.setLineDash([]);
+    document.getElementById('tipX').textContent=tx.toFixed(2);
+    if(showExp){
+      const ey=Math.pow(b,tx);
+      document.getElementById('tipExpY').textContent=(ey>9999?'∞':ey.toFixed(3));
+      if(ey>=yMin&&ey<=yMax){
+        gctx.fillStyle='#60a5fa';gctx.beginPath();gctx.arc(mouseGX,toCanvasY(ey),5,0,Math.PI*2);gctx.fill();
+      }
+    }
+    if(showLog&&tx>0){
+      const ly=Math.log(tx)/Math.log(b);
+      document.getElementById('tipLogY').textContent=ly.toFixed(3);
+      if(ly>=yMin&&ly<=yMax){
+        gctx.fillStyle='#34d399';gctx.beginPath();gctx.arc(mouseGX,toCanvasY(ly),5,0,Math.PI*2);gctx.fill();
+      }
+    } else if(showLog){document.getElementById('tipLogY').textContent='—';}
+  }
+}
+
+gc.addEventListener('mousemove',e=>{
+  if(!tracerActive)return;
+  const r=gc.getBoundingClientRect();
+  mouseGX=(e.clientX-r.left)*(gc.width/r.width);
+  drawGraph();
+});
+gc.addEventListener('touchmove',e=>{
+  if(!tracerActive)return;
+  const r=gc.getBoundingClientRect();
+  mouseGX=(e.touches[0].clientX-r.left)*(gc.width/r.width);
+  drawGraph();
+},{passive:true});
+window.addEventListener('resize',()=>{resizeGraphCanvas();drawGraph();resizeExpCanvas();updateExpSim();});
+// Init
+setTimeout(()=>{updateBVal();resizeGraphCanvas();drawGraph();},100);
+
+// ─────────────────────────────────────────────
+// EKSPEDISI (Growth & Decay)
+// ─────────────────────────────────────────────
+const ec=document.getElementById('expCanvas');
+const ectx=ec.getContext('2d');
+let scenarioMode='growth';
+
+function resizeExpCanvas(){ec.width=ec.offsetWidth;ec.height=ec.offsetHeight||180;}
+
+function setScenario(mode){
+  scenarioMode=mode;
+  const r=mode==='growth'?0.5:-0.3;
+  document.getElementById('sliderR').value=r;
+  document.getElementById('scGrowth').classList.toggle('active',mode==='growth');
+  document.getElementById('scDecay').classList.toggle('active',mode==='decay');
+  updateExpSim();
+}
+
+function updateExpSim(){
+  const P0=parseFloat(document.getElementById('sliderP0').value);
+  const r=parseFloat(document.getElementById('sliderR').value);
+  const target=parseFloat(document.getElementById('sliderTarget').value);
+  document.getElementById('valP0').textContent=P0;
+  document.getElementById('valR').textContent=r.toFixed(2);
+  document.getElementById('valTarget').textContent=target.toLocaleString();
+  document.getElementById('scGrowth').classList.toggle('active',r>=0);
+  document.getElementById('scDecay').classList.toggle('active',r<0);
+  // Calc time
+  if(r!==0&&target>P0&&r>0){
+    const t=(Math.log(target/P0)/r);
+    document.getElementById('calcResult').textContent=t.toFixed(2);
+    document.getElementById('calcFormula').textContent=`t = ln(${target}/${P0}) / ${r.toFixed(2)} = ${t.toFixed(2)}`;
+  } else if(r<0&&target<P0){
+    const t=(Math.log(target/P0)/r);
+    document.getElementById('calcResult').textContent=t.toFixed(2);
+    document.getElementById('calcFormula').textContent=`t = ln(${target}/${P0}) / ${r.toFixed(2)} = ${t.toFixed(2)}`;
+  } else {
+    document.getElementById('calcResult').textContent='—';
+    document.getElementById('calcFormula').textContent='t = ln(P/P₀) / r';
+  }
+  // Update rescue table (fixed r=0.5, P0=100)
+  const targets=[1000,5000,10000,20000];
+  const ids=['t1000','t5000','t10000','t20000'];
+  targets.forEach((tp,i)=>{
+    const tv=Math.log(tp/100)/0.5;
+    document.getElementById(ids[i]).textContent=tv.toFixed(2);
+  });
+  // Vaksin decision
+  const tvax=Math.log(20000/100)/0.5;
+  document.getElementById('tVaksin').textContent=tvax.toFixed(2);
+  // Build observation table
+  const rVals=[0.1,0.5,0.8,-0.3];
+  const tb=document.getElementById('expTbody');
+  tb.innerHTML=rVals.map(rv=>{
+    const p5=(P0*Math.exp(rv*5)).toFixed(1);
+    const p10=(P0*Math.exp(rv*10)).toFixed(1);
+    const p20=(P0*Math.exp(rv*20)).toFixed(1);
+    const beh=rv>0?`<span style="color:#059669;font-weight:700;">↑ Naik</span>`:`<span style="color:#dc2626;font-weight:700;">↓ Turun</span>`;
+    return `<tr><td style="color:${rv<0?'#dc2626':'#059669'};font-weight:700;">${rv}</td><td>${p5}</td><td>${p10}</td><td>${p20}</td><td>${beh}</td></tr>`;
+  }).join('');
+  // Draw graph
+  drawExpGraph(P0,r,target);
+}
+
+function drawExpGraph(P0,r,target){
+  if(!ec.width||!ec.offsetWidth){resizeExpCanvas();}
+  const W=ec.width,H=ec.height;
+  ectx.clearRect(0,0,W,H);
+  ectx.fillStyle='#0f172a';ectx.fillRect(0,0,W,H);
+  const tMax=20;
+  // Compute y range
+  let yMax=P0*Math.exp(Math.max(r,0)*tMax)*1.1;
+  if(r<0)yMax=P0*1.3;
+  yMax=Math.max(yMax,target*1.1,P0*1.2);
+  const yMin=0;
+  function tx(t){return t/tMax*W;}
+  function ty(y){return H-(y-yMin)/(yMax-yMin)*H;}
+  // Grid
+  ectx.strokeStyle='rgba(148,163,184,0.08)';ectx.lineWidth=1;
+  for(let t=0;t<=tMax;t+=5){ectx.beginPath();ectx.moveTo(tx(t),0);ectx.lineTo(tx(t),H);ectx.stroke();}
+  for(let i=0;i<=4;i++){const y=(yMax-yMin)/4*i;ectx.beginPath();ectx.moveTo(0,ty(y));ectx.lineTo(W,ty(y));ectx.stroke();}
+  // Axes
+  ectx.strokeStyle='rgba(255,255,255,0.25)';ectx.lineWidth=1.5;
+  ectx.beginPath();ectx.moveTo(0,H);ectx.lineTo(W,H);ectx.stroke();
+  ectx.beginPath();ectx.moveTo(0,0);ectx.lineTo(0,H);ectx.stroke();
+  // Labels
+  ectx.fillStyle='rgba(148,163,184,0.7)';ectx.font='9px JetBrains Mono,monospace';ectx.textAlign='center';
+  for(let t=5;t<=tMax;t+=5)ectx.fillText(t,tx(t),H-3);
+  ectx.textAlign='right';
+  ectx.fillText(Math.round(yMax*0.5),36,ty(yMax*0.5)+3);
+  ectx.fillText('P',8,10);
+  ectx.textAlign='center';ectx.fillText('t →',W-6,H-3);
+  // Target line
+  if(target>=yMin&&target<=yMax){
+    ectx.strokeStyle='rgba(248,113,113,0.5)';ectx.lineWidth=1.5;ectx.setLineDash([6,3]);
+    ectx.beginPath();ectx.moveTo(0,ty(target));ectx.lineTo(W,ty(target));ectx.stroke();
+    ectx.setLineDash([]);
+    ectx.fillStyle='rgba(248,113,113,0.8)';ectx.font='9px JetBrains Mono';ectx.textAlign='right';
+    ectx.fillText('Target: '+target.toLocaleString(),W-6,ty(target)-4);
+  }
+  // P(t) curve
+  const grad=ectx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0,'#8b5cf6');grad.addColorStop(0.5,'#60a5fa');grad.addColorStop(1,'#34d399');
+  ectx.strokeStyle=grad;ectx.lineWidth=2.5;
+  ectx.shadowColor='rgba(139,92,246,0.4)';ectx.shadowBlur=8;
+  ectx.beginPath();
+  for(let t=0;t<=tMax;t+=0.1){
+    const p=P0*Math.exp(r*t);
+    const py=ty(p);
+    if(py<-H||py>H*2){continue;}
+    if(t===0)ectx.moveTo(tx(t),py);
+    else ectx.lineTo(tx(t),py);
+  }
+  ectx.stroke();ectx.shadowBlur=0;
+  // Formula label
+  ectx.fillStyle='rgba(167,139,250,0.9)';ectx.font='bold 10px JetBrains Mono,monospace';ectx.textAlign='left';
+  ectx.fillText(`P(t)=${P0}·e^(${r.toFixed(2)}t)`,8,14);
+  // Intersection marker
+  if(r!==0){
+    let tIntersect;
+    if(r>0&&target>P0)tIntersect=Math.log(target/P0)/r;
+    else if(r<0&&target<P0)tIntersect=Math.log(target/P0)/r;
+    if(tIntersect&&tIntersect>0&&tIntersect<=tMax){
+      const cx=tx(tIntersect),cy=ty(target);
+      ectx.fillStyle='#f87171';
+      ectx.beginPath();ectx.arc(cx,cy,5,0,Math.PI*2);ectx.fill();
+      ectx.strokeStyle='rgba(255,255,255,0.6)';ectx.lineWidth=1.5;
+      ectx.beginPath();ectx.arc(cx,cy,5,0,Math.PI*2);ectx.stroke();
+      ectx.strokeStyle='rgba(248,113,113,0.4)';ectx.setLineDash([3,3]);
+      ectx.beginPath();ectx.moveTo(cx,cy);ectx.lineTo(cx,H);ectx.stroke();
+      ectx.setLineDash([]);
+      ectx.fillStyle='#fca5a5';ectx.font='9px JetBrains Mono';ectx.textAlign='center';
+      ectx.fillText('t='+tIntersect.toFixed(1),cx,H-12);
+    }
+  }
+}
+setTimeout(()=>{resizeExpCanvas();updateExpSim();},200);
+
+// ─────────────────────────────────────────────
+// DISKUSI
+// ─────────────────────────────────────────────
+const dqData={};
+function saveDQ(n,v){dqData[n]=v;}
+function clearDQ(){
+  for(let i=1;i<=5;i++){
+    dqData[i]='';
+    const el=document.getElementById('dq'+i);
+    if(el)el.value='';
+  }
+}
+
+// ─────────────────────────────────────────────
+// KUIS
+// ─────────────────────────────────────────────
+const quizData=[
+  {q:'Manakah yang BENAR tentang fungsi f(x) = 3ˣ?',opts:['Grafiknya memotong sumbu-X di titik (1,0)','Grafiknya memotong sumbu-Y di titik (0,1)','Asimtotnya adalah garis x = 0','Domainnya adalah bilangan positif saja'],ans:1,fb:'Benar! Karena 3⁰ = 1, grafik memotong sumbu-Y di (0,1). Asimtotnya adalah y = 0, bukan x = 0.'},
+  {q:'Jika f(x) = 2ˣ, berapakah nilai f(3)?',opts:['6','8','9','12'],ans:1,fb:'Benar! f(3) = 2³ = 2×2×2 = 8.'},
+  {q:'Fungsi logaritma g(x) = log₂(x) TIDAK terdefinisi untuk...',opts:['x = 0.5','x = 4','x = -1','x = 1'],ans:2,fb:'Benar! Logaritma hanya terdefinisi untuk x > 0. Nilai x = -1 tidak masuk domain.'},
+  {q:'Manakah pasangan titik yang menunjukkan sifat invers antara 2ˣ dan log₂(x)?',opts:['(2,4) di eksponen dan (2,4) di logaritma','(3,8) di eksponen dan (8,3) di logaritma','(0,1) di eksponen dan (0,1) di logaritma','(2,4) di eksponen dan (4,2) di eksponen'],ans:1,fb:'Benar! Jika (a,b) ada di eksponen, maka (b,a) ada di logaritma karena keduanya adalah invers.'},
+  {q:'Sebuah populasi bakteri mengikuti P(t) = 100·e^(0.5t). Berapa populasi saat t = 4?',opts:['735','546','200','1000'],ans:0,fb:'Benar! P(4) = 100·e^(0.5×4) = 100·e² ≈ 100×7.389 ≈ 739 (pilihan terdekat: 735).'},
+  {q:'Jika asimtot horizontal fungsi eksponen adalah y = 0, maka asimtot vertikal fungsi logaritma adalah...',opts:['y = 1','x = 1','x = 0','y = 0'],ans:2,fb:'Benar! Karena logaritma adalah invers dari eksponen, asimtot vertikal logaritma adalah x = 0 (sumbu-Y).'},
+  {q:'Untuk mencari waktu saat P(t) = 1000 dengan P₀ = 100 dan r = 0.5, rumus yang digunakan adalah...',opts:['t = 1000/100 × 0.5','t = ln(1000/100) / 0.5','t = log(1000) × 0.5','t = 100 × e^0.5'],ans:1,fb:'Benar! Dari P = P₀·eʳᵗ, kita dapatkan t = ln(P/P₀)/r = ln(10)/0.5 ≈ 4.61.'},
+  {q:'Apa yang terjadi pada grafik f(x) = bˣ ketika nilai b berada antara 0 dan 1 (misal b = 0.5)?',opts:['Grafik naik dari kiri ke kanan','Grafik menjadi garis lurus horizontal','Grafik turun dari kiri ke kanan (peluruhan)','Grafik tidak terdefinisi'],ans:2,fb:'Benar! Saat 0 < b < 1, grafik menunjukkan peluruhan eksponensial — kurva turun dari kiri ke kanan.'},
+];
+let qPage=0;
+let qAnswers=Array(quizData.length).fill(null);
+let qSubmitted=Array(quizData.length).fill(false);
+
+function buildQuiz(){
+  const grid=document.getElementById('quizGrid');
+  grid.innerHTML='';
+  const perPage=4;
+  const start=qPage*perPage;
+  const end=Math.min(start+perPage,quizData.length);
+  for(let i=start;i<end;i++){
+    const q=quizData[i];
+    const div=document.createElement('div');
+    div.className='card';div.style.marginBottom='0';div.style.display='flex';div.style.flexDirection='column';div.style.overflow='auto';
+    div.innerHTML=`<div class="ch" style="margin-bottom:5px;">
+        <div class="ci b" style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">${i+1}</div>
+        <div class="qtext" style="margin:0;font-size:clamp(12px,1.3vw,13.5px);">${q.q}</div>
+      </div>
+      <ul class="opts" id="opts${i}">${q.opts.map((o,oi)=>`
+        <li class="opt${qAnswers[i]===oi?' sel':''}${qSubmitted[i]&&oi===q.ans?' correct':''}${qSubmitted[i]&&qAnswers[i]===oi&&oi!==q.ans?' wrong':''}" onclick="selectOpt(${i},${oi},this.parentElement)">
+          <input type="radio" name="q${i}" ${qAnswers[i]===oi?'checked':''} ${qSubmitted[i]?'disabled':''}>
+          <span>${o}</span>
+        </li>`).join('')}
+      </ul>
+      <div class="qfb${qSubmitted[i]?(' on '+(qAnswers[i]===q.ans?'ok':'bad')):''}">
+        ${qSubmitted[i]?(qAnswers[i]===q.ans?'✅ ':'❌ ')+q.fb:''}
+      </div>`;
+    grid.appendChild(div);
+  }
+  updateQuizNav();
+  document.getElementById('qProgFill').style.width=(qSubmitted.filter(Boolean).length/quizData.length*100)+'%';
+}
+function selectOpt(qi,oi,ul){
+  if(qSubmitted[qi])return;
+  qAnswers[qi]=oi;
+  ul.querySelectorAll('.opt').forEach((li,idx)=>{
+    li.classList.toggle('sel',idx===oi);
+    li.querySelector('input').checked=idx===oi;
+  });
+}
+function updateQuizNav(){
+  const perPage=4,total=quizData.length;
+  const start=qPage*perPage,end=Math.min(start+perPage,total);
+  document.getElementById('qCounter').textContent=`Soal ${start+1}–${end} / ${total}`;
+  document.getElementById('btnPrev').style.display=qPage>0?'':'none';
+  const isLast=end>=total;
+  document.getElementById('btnNextQ').style.display=isLast?'none':'';
+  document.getElementById('btnSubmitQ').style.display=isLast?'':'none';
+}
+function nextQ(){qPage++;buildQuiz();}
+function prevQ(){qPage--;buildQuiz();}
+function submitQuiz(){
+  // Auto-submit current page answers
+  const perPage=4,start=qPage*perPage,end=Math.min(start+perPage,quizData.length);
+  for(let i=start;i<end;i++)qSubmitted[i]=qAnswers[i]!==null?true:qSubmitted[i];
+  // Submit all
+  qSubmitted=qSubmitted.map((_,i)=>qAnswers[i]!==null||qSubmitted[i]);
+  buildQuiz();
+  const correct=quizData.filter((_,i)=>qAnswers[i]===quizData[i].ans).length;
+  const pct=Math.round(correct/quizData.length*100);
+  document.getElementById('scoreBig').textContent=correct;
+  document.getElementById('scorePct').textContent=`${correct} dari ${quizData.length} benar (${pct}%)`;
+  const grade=pct>=90?'🌟 Luar Biasa!':pct>=75?'👏 Bagus!':pct>=60?'💪 Terus Berlatih!':'📚 Pelajari Lagi';
+  document.getElementById('scoreGrade').textContent=grade;
+  document.getElementById('scoreGrade').style.color=pct>=75?'#059669':'#d97706';
+  document.getElementById('scoreOverlay').classList.add('on');
+}
+function resetQuiz(){
+  qPage=0;qAnswers=Array(quizData.length).fill(null);qSubmitted=Array(quizData.length).fill(false);buildQuiz();
+}
+buildQuiz();
+</script>
+</body>
+</html>
